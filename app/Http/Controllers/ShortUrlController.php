@@ -39,6 +39,11 @@ class ShortUrlController extends Controller
         return view('dashboard',compact('users','urls'));
     }
 
+    public function index()
+    {
+      
+    }
+
 
     /**
      * Show the form for creating a new resource.
@@ -131,9 +136,20 @@ class ShortUrlController extends Controller
 
         }elseif(Auth::user()->role == 2){
 
-             $urls = $query->with('user')->get();
+            if(Auth::user()->parent_id != ''){
+                $parentId = Auth::user()->parent_id;
+            }else{
+                $parentId = $user->id;
+            }
+
+            $get_id = User::where('parent_id',$parentId)->pluck('id');
+            $get_id[] = Auth::user()->id;
+              
+             $urls = $query->with('user')->where('user_id',$get_id)->get();
 
         }else{
+
+            $urls = $query->with('user')->where('user_id',Auth::user()->id)->get();
 
         }
 
